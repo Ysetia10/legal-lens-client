@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, CheckCircle, Clock, MessageSquare, FileText, Shield } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, MessageSquare, FileText, Shield, Info } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,9 +32,10 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ document, analysi
   const handleAskQuestion = () => {
     if (!question.trim()) return;
     
+    // This will be replaced with actual API call to backend
     setChatHistory(prev => [...prev, 
       { type: 'user', message: question },
-      { type: 'assistant', message: 'Based on the document analysis, this appears to be a standard clause with low risk. The termination conditions are clearly defined and favor both parties equally.' }
+      { type: 'assistant', message: 'This response will come from your backend API. Connect your document analysis service to provide real answers.' }
     ]);
     setQuestion('');
   };
@@ -54,15 +55,15 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ document, analysi
             <div className="text-sm text-slate-600 space-y-2">
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                <span>Extracting key clauses...</span>
+                <span>Extracting text content...</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                <span>Analyzing risk factors...</span>
+                <span>Identifying key clauses...</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
-                <span>Simplifying legal language...</span>
+                <span>Analyzing risks and terms...</span>
               </div>
             </div>
           </div>
@@ -73,7 +74,22 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ document, analysi
 
   return (
     <div className="space-y-6">
-      {/* Risk Overview */}
+      {/* Backend Integration Notice */}
+      <Card className="border-blue-200 bg-blue-50">
+        <CardContent className="p-4">
+          <div className="flex items-start space-x-3">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <h3 className="font-medium text-blue-900 mb-1">Ready for Backend Integration</h3>
+              <p className="text-sm text-blue-800">
+                Connect your document analysis API to populate real data in the sections below.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Risk Overview - Ready for dynamic data */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -85,28 +101,19 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ document, analysi
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Overall Risk Level</span>
-              <Badge variant="secondary" className="bg-green-100 text-green-800">Low Risk</Badge>
+              <Badge variant="secondary" className="bg-slate-100 text-slate-600">Pending Analysis</Badge>
             </div>
             
-            <div className="space-y-3">
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm">Standard termination clauses</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
-                <span className="text-sm">High penalty fees (Review needed)</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm">Clear payment terms</span>
-              </div>
+            <div className="text-center py-8 text-slate-500">
+              <Shield className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+              <p className="font-medium mb-2">Risk analysis will appear here</p>
+              <p className="text-sm">Connect your backend to display risk assessment results</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Key Clauses */}
+      {/* Key Clauses - Ready for dynamic data */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
@@ -115,36 +122,10 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ document, analysi
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <div className="p-3 bg-slate-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Termination Clause</span>
-                <Badge variant="outline">Section 8.2</Badge>
-              </div>
-              <p className="text-sm text-slate-600">
-                Either party may terminate with 30 days written notice without cause.
-              </p>
-            </div>
-            
-            <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Penalty Clause</span>
-                <Badge variant="outline" className="bg-amber-100">Section 12.1</Badge>
-              </div>
-              <p className="text-sm text-slate-600">
-                Early termination penalty of 50% of remaining contract value - consider negotiating this down.
-              </p>
-            </div>
-            
-            <div className="p-3 bg-slate-50 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-medium text-sm">Payment Terms</span>
-                <Badge variant="outline">Section 4.1</Badge>
-              </div>
-              <p className="text-sm text-slate-600">
-                Net 30 payment terms with 2% early payment discount if paid within 10 days.
-              </p>
-            </div>
+          <div className="text-center py-8 text-slate-500">
+            <FileText className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+            <p className="font-medium mb-2">Key clauses will be extracted here</p>
+            <p className="text-sm">Your backend will identify and highlight important document sections</p>
           </div>
         </CardContent>
       </Card>
@@ -196,11 +177,12 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ document, analysi
             
             {/* Suggested Questions */}
             <div className="text-xs text-slate-500">
-              <p className="mb-2">Try asking:</p>
+              <p className="mb-2">Example questions to try:</p>
               <ul className="space-y-1">
                 <li>• "What are the main risks in this contract?"</li>
                 <li>• "Can I terminate this agreement early?"</li>
                 <li>• "What are my payment obligations?"</li>
+                <li>• "Are there any unusual clauses I should be aware of?"</li>
               </ul>
             </div>
           </div>

@@ -66,8 +66,8 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, analysisCompl
                 {getFileType(document.name)} • {formatFileSize(document.size)}
               </p>
             </div>
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              Analyzed
+            <Badge variant="secondary" className={analysisComplete ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
+              {analysisComplete ? "Analyzed" : "Processing"}
             </Badge>
           </div>
 
@@ -75,49 +75,17 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, analysisCompl
           <div className="border rounded-lg p-4 bg-white min-h-96">
             {analysisComplete ? (
               <div className="space-y-4">
-                <div className="text-sm font-medium text-slate-900 border-b pb-2">
-                  SERVICE AGREEMENT
-                </div>
-                
-                <div className="prose prose-sm max-w-none text-slate-700 space-y-4">
-                  <p>
-                    This Service Agreement ("Agreement") is entered into on [DATE] between [COMPANY NAME], 
-                    a corporation organized under the laws of [STATE] ("Company"), and [CLIENT NAME] ("Client").
+                <div className="text-center text-slate-500">
+                  <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
+                  <h3 className="text-lg font-medium mb-2">Document Analysis Complete</h3>
+                  <p className="text-sm">
+                    The document has been processed and analyzed. 
+                    View the analysis results in the sidebar.
                   </p>
-                  
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-3 my-4">
-                    <p className="text-sm font-medium text-blue-900 mb-1">Key Clause Identified</p>
+                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      <strong>Section 4.1 - Payment Terms:</strong> Client agrees to pay Company within thirty (30) days 
-                      of invoice date. A 2% early payment discount applies if payment is received within ten (10) days.
-                    </p>
-                  </div>
-                  
-                  <p>
-                    The Company agrees to provide consulting services as outlined in Exhibit A attached hereto 
-                    and incorporated by reference. Services shall commence on [START DATE] and continue through 
-                    [END DATE] unless terminated earlier in accordance with this Agreement.
-                  </p>
-                  
-                  <div className="bg-amber-50 border-l-4 border-amber-400 p-3 my-4">
-                    <p className="text-sm font-medium text-amber-900 mb-1">Risk Alert</p>
-                    <p className="text-sm text-amber-800">
-                      <strong>Section 12.1 - Termination Penalty:</strong> Early termination by Client requires 
-                      payment of 50% of remaining contract value. Consider negotiating this percentage down.
-                    </p>
-                  </div>
-                  
-                  <p>
-                    Either party may terminate this Agreement with thirty (30) days written notice. Upon termination, 
-                    Company shall deliver all work product and materials to Client, and Client shall pay all 
-                    outstanding fees for services rendered.
-                  </p>
-                  
-                  <div className="bg-green-50 border-l-4 border-green-400 p-3 my-4">
-                    <p className="text-sm font-medium text-green-900 mb-1">Standard Clause</p>
-                    <p className="text-sm text-green-800">
-                      <strong>Section 8.2 - Termination Rights:</strong> Standard 30-day notice period for termination 
-                      without cause. This is fair and typical for this type of agreement.
+                      <strong>Ready for backend integration:</strong> This component will display 
+                      extracted text, highlighted clauses, and analysis results from your API.
                     </p>
                   </div>
                 </div>
@@ -126,9 +94,10 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, analysisCompl
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
                   <div className="w-12 h-12 bg-slate-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-slate-400" />
+                    <FileText className="w-6 h-6 text-slate-400 animate-pulse" />
                   </div>
                   <p className="text-slate-500">Processing document...</p>
+                  <p className="text-sm text-slate-400 mt-2">Extracting text and analyzing content</p>
                 </div>
               </div>
             )}
