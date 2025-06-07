@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, MessageSquare } from 'lucide-react';
 import DocumentUpload from '../components/DocumentUpload';
 import AnalysisDashboard from '../components/AnalysisDashboard';
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 const Index = () => {
   const [uploadedDocument, setUploadedDocument] = useState<File | null>(null);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDocumentUpload = (file: File) => {
     setUploadedDocument(file);
@@ -17,6 +18,17 @@ const Index = () => {
     setTimeout(() => {
       setAnalysisComplete(true);
     }, 2000);
+  };
+
+  const handleHeaderUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleDocumentUpload(file);
+    }
   };
 
   return (
@@ -34,10 +46,19 @@ const Index = () => {
                 <p className="text-sm text-slate-600">Intelligent Legal Document Analysis</p>
               </div>
             </div>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Upload className="w-4 h-4" />
-              <span>Upload Document</span>
-            </Button>
+            <div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileInputChange}
+                accept=".pdf,.doc,.docx,.txt"
+              />
+              <Button variant="outline" className="flex items-center space-x-2" onClick={handleHeaderUploadClick}>
+                <Upload className="w-4 h-4" />
+                <span>Upload Document</span>
+              </Button>
+            </div>
           </div>
         </div>
       </header>
