@@ -7,17 +7,53 @@ import DocumentViewer from '../components/DocumentViewer';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
+interface AnalysisResult {
+  risk_level: string;
+  key_clauses: string[];
+  summary: string;
+  risks: string[];
+  [key: string]: any;
+}
+
 const Index = () => {
   const [uploadedDocument, setUploadedDocument] = useState<File | null>(null);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleDocumentUpload = (file: File) => {
+  const handleDocumentUpload = async (file: File) => {
     setUploadedDocument(file);
-    // Simulate analysis completion after a delay
-    setTimeout(() => {
+    setAnalysisComplete(false);
+    setIsAnalyzing(true);
+    setError(null);
+    setAnalysisResult(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('http://localhost:8081/api/analyse/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Analysis result:', result);
+      
+      setAnalysisResult(result);
       setAnalysisComplete(true);
-    }, 2000);
+    } catch (err) {
+      console.error('Analysis failed:', err);
+      setError(err instanceof Error ? err.message : 'Analysis failed. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const handleHeaderUploadClick = () => {
@@ -130,12 +166,18 @@ const Index = () => {
               <DocumentViewer 
                 document={uploadedDocument} 
                 analysisComplete={analysisComplete}
+                analysisResult={analysisResult}
+                isAnalyzing={isAnalyzing}
+                error={error}
               />
             </div>
             <div className="lg:col-span-1">
               <AnalysisDashboard 
                 document={uploadedDocument}
                 analysisComplete={analysisComplete}
+                analysisResult={analysisResult}
+                isAnalyzing={isAnalyzing}
+                error={error}
               />
             </div>
           </div>

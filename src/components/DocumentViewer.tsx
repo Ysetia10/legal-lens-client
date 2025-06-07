@@ -1,16 +1,33 @@
 
 import React from 'react';
-import { FileText, Download, Eye } from 'lucide-react';
+import { FileText, Download, Eye, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
+interface AnalysisResult {
+  risk_level: string;
+  key_clauses: string[];
+  summary: string;
+  risks: string[];
+  [key: string]: any;
+}
+
 interface DocumentViewerProps {
   document: File | null;
   analysisComplete: boolean;
+  analysisResult: AnalysisResult | null;
+  isAnalyzing: boolean;
+  error: string | null;
 }
 
-const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, analysisComplete }) => {
+const DocumentViewer: React.FC<DocumentViewerProps> = ({ 
+  document, 
+  analysisComplete, 
+  analysisResult, 
+  isAnalyzing, 
+  error 
+}) => {
   if (!document) return null;
 
   const formatFileSize = (bytes: number) => {
@@ -34,6 +51,19 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, analysisCompl
       default:
         return 'Document';
     }
+  };
+
+  const getStatusBadge = () => {
+    if (error) {
+      return <Badge variant="destructive" className="bg-red-100 text-red-800">Error</Badge>;
+    }
+    if (isAnalyzing) {
+      return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Processing</Badge>;
+    }
+    if (analysisComplete) {
+      return <Badge variant="secondary" className="bg-green-100 text-green-800">Analyzed</Badge>;
+    }
+    return <Badge variant="secondary" className="bg-gray-100 text-gray-800">Uploaded</Badge>;
   };
 
   return (
@@ -66,38 +96,64 @@ const DocumentViewer: React.FC<DocumentViewerProps> = ({ document, analysisCompl
                 {getFileType(document.name)} • {formatFileSize(document.size)}
               </p>
             </div>
-            <Badge variant="secondary" className={analysisComplete ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}>
-              {analysisComplete ? "Analyzed" : "Processing"}
-            </Badge>
+            {getStatusBadge()}
           </div>
 
           {/* Document Content Preview */}
           <div className="border rounded-lg p-4 bg-white min-h-96">
-            {analysisComplete ? (
-              <div className="space-y-4">
-                <div className="text-center text-slate-500">
-                  <FileText className="w-16 h-16 mx-auto mb-4 text-slate-300" />
-                  <h3 className="text-lg font-medium mb-2">Document Analysis Complete</h3>
-                  <p className="text-sm">
-                    The document has been processed and analyzed. 
-                    View the analysis results in the sidebar.
-                  </p>
-                  <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      <strong>Ready for backend integration:</strong> This component will display 
-                      extracted text, highlighted clauses, and analysis results from your API.
-                    </p>
-                  </div>
+            {error ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-500" />
+                  <h3 className="text-lg font-medium mb-2 text-red-700">Analysis Failed</h3>
+                  <p className="text-sm text-red-600">{error}</p>
+                  <p className="text-xs text-gray-500 mt-2">Please try uploading the document again</p>
                 </div>
+              </div>
+            ) : isAnalyzing ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="text-center">
+                  <Loader2 className="w-12 h-12 mx-auto mb-4 text-blue-500 animate-spin" />
+                  <h3 className="text-lg font-medium mb-2">Analyzing Document...</h3>
+                  <p className="text-sm text-slate-600">Processing your document with AI</p>
+                </div>
+              </div>
+            ) : analysisComplete && analysisResult ? (
+              <div className="space-y-6">
+                <div className="text-center">
+                  <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-500" />
+                  <h3 className="text-lg font-medium mb-2">Analysis Complete</h3>
+                </div>
+                
+                {/* Summary */}
+                {analysisResult.summary && (
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <h4 className="font-medium text-blue-900 mb-2">Document Summary</h4>
+                    <p className="text-sm text-blue-800">{analysisResult.summary}</p>
+                  </div>
+                )}
+
+                {/* Key Clauses */}
+                {analysisResult.key_clauses && analysisResult.key_clauses.length > 0 && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-2">Key Clauses Identified</h4>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      {analysisResult.key_clauses.map((clause, index) => (
+                        <li key={index} className="flex items-start space-x-2">
+                          <span className="text-blue-600">•</span>
+                          <span>{clause}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="flex items-center justify-center h-64">
                 <div className="text-center">
-                  <div className="w-12 h-12 bg-slate-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-slate-400 animate-pulse" />
-                  </div>
-                  <p className="text-slate-500">Processing document...</p>
-                  <p className="text-sm text-slate-400 mt-2">Extracting text and analyzing content</p>
+                  <FileText className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+                  <h3 className="text-lg font-medium mb-2">Document Uploaded</h3>
+                  <p className="text-sm text-slate-600">Ready for analysis</p>
                 </div>
               </div>
             )}
