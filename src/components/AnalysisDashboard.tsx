@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { AlertTriangle, CheckCircle, Clock, MessageSquare, FileText, Shield, Info, Loader2 } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, MessageSquare, FileText, Shield, Info, Loader2, Send } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -33,6 +32,7 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({
   const [progress, setProgress] = useState(0);
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'assistant', message: string}>>([]);
+  const [isAskingQuestion, setIsAskingQuestion] = useState(false);
 
   useEffect(() => {
     if (isAnalyzing) {
@@ -48,21 +48,53 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({
   }, [isAnalyzing, analysisComplete]);
 
   const handleAskQuestion = async () => {
-    if (!question.trim() || !analysisResult) return;
+    if (!question.trim() || !document || !analysisComplete) return;
+    
+    setIsAskingQuestion(true);
     
     // Add user question to chat
     setChatHistory(prev => [...prev, { type: 'user', message: question }]);
     
-    // TODO: Replace with actual API call to your backend for Q&A
-    // For now, showing placeholder response
-    setTimeout(() => {
+    try {
+      const formData = new FormData();
+      formData.append('file', document);
+      formData.append('question', question);
+
+      const response = await fetch('http://localhost:8081/api/analyse/answer', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const answer = await response.text();
+      console.log('Q&A answer:', answer);
+      
+      // Add assistant response to chat
       setChatHistory(prev => [...prev, {
         type: 'assistant',
-        message: 'This Q&A feature will be connected to your backend. The response will analyze the document based on your question.'
+        message: answer
       }]);
-    }, 1000);
+    } catch (err) {
+      console.error('Q&A failed:', err);
+      setChatHistory(prev => [...prev, {
+        type: 'assistant',
+        message: 'Sorry, I encountered an error while processing your question. Please try again.'
+      }]);
+    } finally {
+      setIsAskingQuestion(false);
+    }
     
     setQuestion('');
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleAskQuestion();
+    }
   };
 
   const getRiskLevelColor = (riskLevel: string) => {
@@ -229,24 +261,38 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({
                     </div>
                   </div>
                 ))}
+                {isAskingQuestion && (
+                  <div className="text-left">
+                    <div className="inline-block p-2 rounded-lg bg-white border text-slate-900">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             
             {/* Question Input */}
-            <div className="space-y-3">
+            <div className="flex space-x-2">
               <Textarea
                 placeholder="Ask a question about this document..."
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                className="resize-none"
+                onKeyPress={handleKeyPress}
+                className="resize-none flex-1"
                 rows={3}
+                disabled={isAskingQuestion}
               />
               <Button 
                 onClick={handleAskQuestion}
-                disabled={!question.trim()}
-                className="w-full"
+                disabled={!question.trim() || isAskingQuestion}
+                size="sm"
+                className="self-end"
               >
-                Ask Question
+                {isAskingQuestion ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
               </Button>
             </div>
             
