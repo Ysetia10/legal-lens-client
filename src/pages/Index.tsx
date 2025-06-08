@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, FileText, AlertTriangle, CheckCircle, MessageSquare } from 'lucide-react';
 import DocumentUpload from '../components/DocumentUpload';
@@ -21,6 +20,7 @@ const Index = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'assistant', message: string}>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDocumentUpload = async (file: File) => {
@@ -29,6 +29,7 @@ const Index = () => {
     setIsAnalyzing(true);
     setError(null);
     setAnalysisResult(null);
+    setChatHistory([]); // Reset chat history for new document
 
     try {
       const formData = new FormData();
@@ -169,6 +170,7 @@ const Index = () => {
                 analysisResult={analysisResult}
                 isAnalyzing={isAnalyzing}
                 error={error}
+                chatHistory={chatHistory}
               />
             </div>
             <div className="lg:col-span-1">
@@ -178,6 +180,8 @@ const Index = () => {
                 analysisResult={analysisResult}
                 isAnalyzing={isAnalyzing}
                 error={error}
+                chatHistory={chatHistory}
+                setChatHistory={setChatHistory}
               />
             </div>
           </div>

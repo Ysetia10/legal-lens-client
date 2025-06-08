@@ -20,6 +20,8 @@ interface AnalysisDashboardProps {
   analysisResult: AnalysisResult | null;
   isAnalyzing: boolean;
   error: string | null;
+  chatHistory: Array<{type: 'user' | 'assistant', message: string}>;
+  setChatHistory: React.Dispatch<React.SetStateAction<Array<{type: 'user' | 'assistant', message: string}>>>;
 }
 
 const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({ 
@@ -27,11 +29,12 @@ const AnalysisDashboard: React.FC<AnalysisDashboardProps> = ({
   analysisComplete, 
   analysisResult, 
   isAnalyzing, 
-  error 
+  error,
+  chatHistory,
+  setChatHistory
 }) => {
   const [progress, setProgress] = useState(0);
   const [question, setQuestion] = useState('');
-  const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'assistant', message: string}>>([]);
   const [isAskingQuestion, setIsAskingQuestion] = useState(false);
 
   useEffect(() => {
